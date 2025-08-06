@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Generatore QR VIN + Targa</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      text-align: center;
+    }
+    #qrcode {
+      margin-top: 2rem;
+    }
+    #info {
+      margin-top: 1rem;
+      font-size: 1.1rem;
+    }
+    .label {
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Genera QR Code per VIN</h1>
+
+  <label for="numero">Inserisci codice furgone (es. N2):</label>
+  <input type="text" id="numero" placeholder="Es. N2" />
+  <button onclick="generaQR()">Genera QR</button>
+
+  <div id="qrcode"></div>
+  <div id="info"></div>
+
+  <script>
+    const dataMap = {
+      "N2":     { vin: "VR3EFYHT2PJ828414", targa: "GR102GD" },
+      "N4":     { vin: "VR3EFYHT2PJ828461", targa: "GR134GD" },
+      "N6":     { vin: "VXFVBYHVMP7809350", targa: "GN600WP" },
+      "N7":     { vin: "VXFVBYHVMP7811262", targa: "GN604WP" },
+      "N8":     { vin: "VXFVBYHVMP7810525", targa: "GN977XR" },
+      "N9":     { vin: "VXFVBYHVMP7811263", targa: "GN987XR" },
+      "N11":    { vin: "ZFA25000002Y80513", targa: "GS182LM" },
+      "N12":    { vin: "ZFA25000002Y82912", targa: "GS984LP" },
+      "N13":    { vin: "ZFA25000002Y83509", targa: "GS203NR" },
+      "N15":    { vin: "VF7VBYHVMP7845021", targa: "GP040ZC" },
+      "N16":    { vin: "VF7VBYHVMP7844233", targa: "GP036ZC" },
+      "N18":    { vin: "ZFA25000002Y82871", targa: "GS952LP" },
+      "N19":    { vin: "ZFA25000002Y83196", targa: "GS192NR" },
+      "N21":    { vin: "ZFA25000002Y83096", targa: "GS994LP" },
+      "N22":    { vin: "ZFA25000002Y82991", targa: "GS978LP" },
+      "N23":    { vin: "ZFA25000002Y83210", targa: "GS184NR" },
+      "N26":    { vin: "ZFA25000002Y82484", targa: "GS979LP" },
+      "N27":    { vin: "VF7YFAPFA12V16619", targa: "GK698BR" },
+      "N34":    { vin: "ZFA25000002Y82810", targa: "GS976LP" },
+      "N43":    { vin: "ZFA25000002Y82435", targa: "GS956LP" },
+      "N46":    { vin: "ZFA25000002Y82527", targa: "GS958LP" },
+      "N47":    { vin: "ZFA25000002Y80456", targa: "GS155LM" },
+      "N48":    { vin: "ZFA25000002Y80595", targa: "GS171LM" },
+      "N49":    { vin: "ZFA25000002Y83158", targa: "GS190NR" },
+      "N51":    { vin: "ZFA25000002Y82313", targa: "GS993LP" },
+      "N52":    { vin: "ZFA25000002Y83833", targa: "GS196NR" },
+      "N53":    { vin: "ZFA25000002Y80474", targa: "GS174LM" },
+      "N54":    { vin: "ZFA25000002Y85331", targa: "GS204NR" },
+      "N55":    { vin: "ZFA25000002Y81851", targa: "GS970LP" },
+      "N56":    { vin: "ZFA25000002Y80488", targa: "GS154LM" },
+      "N58":    { vin: "VXFVBYHVMP7810524", targa: "GN962XR" },
+      "N100":   { vin: "VXFVBYHVMPZ019738", targa: "GN360VA" },
+      "N102":   { vin: "VF1FL000973719532", targa: "GX096DX" },
+      "N104":   { vin: "VF1FL000X72688989", targa: "GT431TX" },
+      "N105":   { vin: "VXFVBYHVMP7807958", targa: "GN579WP" },
+      "N108":   { vin: "VYFEFYHT2PJ681878", targa: "GP876BT" },
+      "N113":   { vin: "YAREDYHT2RJ737002", targa: "GW053LF" },
+      "N114":   { vin: "ZFA25000002Y80456", targa: "GS155LM" },
+      "N117":   { vin: "ZFA2250000U182488", targa: "GV441NS" },
+      "N200":   { vin: "ZFA2250000U148100", targa: "GT559LL" },
+      "N201":   { vin: "VNVNFK00471369863", targa: "GN962PZ" },
+      "N202":   { vin: "ZFA2250000U151120", targa: "GW299TX" },
+      "N203":   { vin: "YAREDYHT2RJ812776", targa: "GX483KY" },
+      "N205":   { vin: "VNVNFK00671492273", targa: "GP738RW" },
+      "N206":   { vin: "VNVNFK00769610668", targa: "GJ313EC" }
+    };
+
+    function generaQR() {
+      const codice = document.getElementById("numero").value.trim().toUpperCase();
+      const entry = dataMap[codice];
+      const qrDiv = document.getElementById("qrcode");
+      const infoDiv = document.getElementById("info");
+
+      qrDiv.innerHTML = "";
+      infoDiv.innerHTML = "";
+
+      if (entry) {
+        new QRCode(qrDiv, {
+          text: entry.vin,
+          width: 200,
+          height: 200
+        });
+
+        infoDiv.innerHTML = `
+          <div><span class="label">Targa:</span> ${entry.targa}</div>
+          <div><span class="label">VIN:</span> ${entry.vin}</div>
+        `;
+      } else {
+        infoDiv.innerHTML = `<p style="color:red;">Codice non trovato. Controlla e riprova.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>
